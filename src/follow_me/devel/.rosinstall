@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/bashar/catkin_test/src/follow_me/devel/setup.sh

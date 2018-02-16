@@ -1,0 +1,8 @@
+prefix=/home/bashar/catkin_test/install
+
+Name: display_laser
+Description: Description of display_laser
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/bashar/catkin_test/install/lib 
+Requires: 
