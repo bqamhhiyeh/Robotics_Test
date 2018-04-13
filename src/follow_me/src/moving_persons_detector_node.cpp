@@ -65,6 +65,7 @@ private:
     geometry_msgs::Point moving_persons_detected[1000];// to store the middle of each moving person
 
     //to store the goal to reach that we will be published
+    geometry_msgs::Point old_goal_to_reach;    
     geometry_msgs::Point goal_to_reach;
 
     // GRAPHICAL DISPLAY
@@ -92,6 +93,9 @@ moving_persons_detector() {
     current_robot_moving = true;
     new_laser = false;
     new_robot = false;
+
+    old_goal_to_reach.x = 0;
+    old_goal_to_reach.y = 0;
 
     //INFINTE LOOP TO COLLECT LASER DATA AND PROCESS THEM
     ros::Rate r(10);// this node will run at 10hz
@@ -133,7 +137,12 @@ void update() {
             populateMarkerTopic();
 
             //to publish the goal_to_reach
-            pub_moving_persons_detector.publish(goal_to_reach);
+            // if(
+            //     old_goal_to_reach.x != goal_to_reach.x 
+            //     && old_goal_to_reach.y != goal_to_reach.y
+            // ) {
+            
+            
         }
         else
             ROS_INFO("robot is moving");
@@ -313,6 +322,16 @@ void detect_moving_persons() {
 
                 //update of the goal
                 //~ ..
+                old_goal_to_reach.x = goal_to_reach.x;
+                old_goal_to_reach.y = goal_to_reach.y;
+
+                goal_to_reach.x = moving_persons_detected[nb_moving_persons_detected-1].x;
+                goal_to_reach.y = moving_persons_detected[nb_moving_persons_detected-1].y;
+            // if (distancePoints(goal_to_reach, old_goal_to_reach) > .5 ){
+            //     ROS_INFO("Old %f %f New %f %f .\n", old_goal_to_reach.x, old_goal_to_reach.y,
+            //        goal_to_reach.x, goal_to_reach.y );
+                pub_moving_persons_detector.publish(goal_to_reach);    
+            // }        
             }
         }
     }

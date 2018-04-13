@@ -119,10 +119,10 @@ void update() {
             //rotation_speed = kp*error + ki * error + kp * error_derivation;
 
             float error_derivation;//To complete
-            error_derivation = error_previous - error;
+            // error_derivation = fabs(error_previous - error);
             //ROS_INFO("error_derivaion: %f", error_derivation);
 
-            error_integral += error;//To complete
+            // error_integral += error;//To complete
             //ROS_INFO("error_integral: %f", error_integral);
 
             //control of rotation with a PID controller
