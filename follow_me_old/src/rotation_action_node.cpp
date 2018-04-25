@@ -101,10 +101,9 @@ void update() {
     }
     //we are performing a rotation
     if ( new_amcl && cond_rotation ) {
-
         rotation_done = current_orientation;
         float error = ( rotation_to_do - rotation_done );
-        ROS_INFO("(rotation_action_node) rotation_to_do/error: %f %f %f", rotation_to_do, rotation_done, error);
+
         if ( error > M_PI ) {
             ROS_WARN("(rotation_action node) error > 180 degrees: %f degrees -> %f degrees", error*180/M_PI, (error-2*M_PI)*180/M_PI);
             error -= 2*M_PI;
@@ -124,10 +123,10 @@ void update() {
             //rotation_speed = kp*error + ki * error + kp * error_derivation;
 
             float error_derivation;//To complete
-            //error_derivation = fabs(error_previous - error);
+            // error_derivation = fabs(error_previous - error);
             //ROS_INFO("error_derivaion: %f", error_derivation);
 
-            //error_integral += error;//To complete
+            // error_integral += error;//To complete
             //ROS_INFO("error_integral: %f", error_integral);
 
             //control of rotation with a PID controller
