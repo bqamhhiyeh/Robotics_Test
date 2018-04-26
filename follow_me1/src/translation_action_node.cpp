@@ -13,7 +13,7 @@
 
 using namespace std;
 
-#define security_distance 0.3
+#define security_distance 0.5
 #define translation_error 0.1
 #define kp 0.5
 #define ki 0
@@ -125,7 +125,7 @@ void update() {
         if ( obstacle_detected ){
             ROS_WARN("obstacle detected: (%f, %f)", closest_obstacle.x, closest_obstacle.y);
             std_msgs::Float32 msg;
-            //obstacle_pub.publish(msg);
+            obstacle_pub.publish(msg);
         }
 
 
@@ -136,14 +136,10 @@ void update() {
             //Implementation of a PID controller for translation_to_do;
             //rotation_speed = kp*error + ki * error + kp * error_derivation;
 
-
             float error_derivation;//To complete
             //error_derivation = error - error_previous;
             //ROS_INFO("error_derivaion: %f", error_derivation);
-            //error_derivation = fabs(error - error_previous)*10;
-            //ROS_INFO("error_derivaion: %f", error_derivation);
 
-            //error_integral = (error+error_previous)/2*0.1;
             //error_integral +=error ;//To complete
             //ROS_INFO("error_integral: %f", error_integral);
 

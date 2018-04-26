@@ -49,7 +49,6 @@ private:
     geometry_msgs::Point old_goal;
     geometry_msgs::Point goals_to_reach[4];
     int current_index;
-    int goal_decider;
 
 public:
 
@@ -74,7 +73,6 @@ decision() {
     sub_translation_done = n.subscribe("translation_done", 1, &decision::translation_doneCallback, this);
     cond_translation = false;
     current_index = 0;
-    goal_decider = 0;
 
     initialise_goals();
 
@@ -128,7 +126,7 @@ decision() {
 void initialise_goals(){
 
     goals_to_reach[0].x = 16.4;//22.8;
-    goals_to_reach[0].y = -17;//-8.22;
+    goals_to_reach[0].y = -18.6;//-8.22;
     goals_to_reach[1].x = 14;
     goals_to_reach[1].y = -8.29;
     goals_to_reach[2].x = 22.8;
@@ -143,28 +141,29 @@ void initialise_goals(){
 
 
 
+// void boolean shouldPublish(geometry_msgs::Point nxt){
 
-bool isGoalReached(){
+//     if(distancePoints(nxt, old_goal) > 0.1){
+//         return true;
+//     }
+//     else{
+//         return false;
+//     }
 
-    int translation = distancePoints(goal_to_reach, current_position);
-    //translation_to_do = sqrt(pow(( goal_to_reach.x - current_position.x ),2) + pow(( goal_to_reach.y - current_position.y ),2));
+// }
 
-    if (translation < 0.3){
-        return true;
-    }
-    else{
-        return false;
-    }
 
-}
+// bool correct_goal(){
+
+//     if 
+
+// }
 
 //UPDATE: main processing
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 void update() {
     goal_to_reach = goals_to_reach[current_index];
-    ROS_INFO("(decision_node) /current_goal: (%f, %f)", goal_to_reach.x, goal_to_reach.y);
-
     // we receive a new /goal_to_reach and robair is not doing a translation or a rotation
     if ( ( new_amcl ) && ( !cond_translation ) && ( !cond_rotation ) ) {
     //if (  new_amcl  ) {
@@ -208,6 +207,21 @@ void update() {
             ROS_INFO("(decision_node) /current_orientation: (%f)", current_orientation);
 
             rotation_to_do = rotation_to_do - current_orientation;
+
+            //current_orientation = fabs(current_orientation);
+            //rotation_to_do = fabs(rotation_to_do);
+            // if(current_orientation > rotation_to_do){
+            //     rotation_to_do = current_orientation - rotation_to_do;
+            // }
+        
+            // else {
+            //     rotation_to_do = rotation_to_do -current_orientation;
+            // }
+            
+
+            //rotation_to_do = current_orientation - rotation_to_do
+
+
             //we first perform the /rotation_to_do
             ROS_INFO("(decision_node) /rotation_to_do: %f", rotation_to_do*180/M_PI);
             std_msgs::Float32 msg_rotation_to_do;
@@ -273,72 +287,15 @@ void update() {
         ROS_INFO("(decision_node) /translation goal_reached (%f, %f)", msg_goal_reached.x, msg_goal_reached.y);
         //to complete
         //msg_goal_reached.data = translation_done;
-        //pub_goal_reached.publish(msg_goal_reached);
+        pub_goal_reached.publish(msg_goal_reached);
 
-        // if(goal_decider==5){
+        ROS_INFO(" ");
+        ROS_INFO("(decision_node) waiting for a /goal_to_reach");
 
-        //     ROS_INFO(" in goal decider ");
-        //     ROS_INFO("(decision_node) waiting for a /goal_to_reach");
-
-        //     current_index = (current_index + 1) % 3;
-        //     ROS_INFO("(decision_node) incremented goal_to_reach index %d", current_index);
-        //     new_amcl = true;
-        //     ROS_INFO("(decision_node) new amcl ");
-        //     goal_decider=0;
-
-                  
-        // }
-
-        if(isGoalReached()){
-
-            ROS_INFO(" ");
-            ROS_INFO("(decision_node) waiting for a /goal_to_reach");
-
-            current_index = (current_index + 1) % 4;
-            ROS_INFO("(decision_node) incremented goal_to_reach index %d", current_index);
-            new_amcl = true;
-            ROS_INFO("(decision_node) new amcl ");
-
-        }
-        else{
-            goal_decider += 1;
-
-
-            ROS_INFO("(decision_node) /goal not reached");
-            ROS_INFO("(decision_node) /current_position: (%f, %f)", current_position.x, current_position.y);
-            translation_to_do =  sqrt(pow(( goal_to_reach.x - current_position.x ),2) + pow(( goal_to_reach.y - current_position.y ),2));
-            goal_to_reach.x -= current_position.x;
-            goal_to_reach.y -= current_position.y;
-
-            ROS_INFO("(decision_node) /translation: (%f)", translation_to_do);
-            if ( translation_to_do ) {
-                cond_translation = true;
-
-                //we compute the /rotation_to_do
-                cond_rotation = true;
-                //rotation_to_do = acos((goal_to_reach.x-current_position.x)/ translation_to_do);
-                rotation_to_do = acos(goal_to_reach.x/translation_to_do);
-
-                if ( goal_to_reach.y < 0 ){
-                    rotation_to_do *=-1;
-
-                }
-      
-                ROS_INFO("(decision_node) /rotation_to_do: (%f)", rotation_to_do);
-                ROS_INFO("(decision_node) /current_orientation: (%f)", current_orientation);
-
-                rotation_to_do = rotation_to_do - current_orientation;
-
-                ROS_INFO("(decision_node) /rotation_to_do: %f", rotation_to_do*180/M_PI);
-                std_msgs::Float32 msg_rotation_to_do;
-                //to complete
-                msg_rotation_to_do.data= rotation_to_do;
-
-                pub_rotation_to_do.publish(msg_rotation_to_do);
-                
-                ROS_INFO("(decision_node) published");
-        }
-
+        current_index = (current_index + 1) % 3;
+        ROS_INFO("(decision_node) incremented goal_to_reach index %d", current_index);
+        new_amcl = true;
+        ROS_INFO("(decision_node) new amcl ");
         //translation_to_do =  sqrt(pow(( goal_to_reach.x - current_position.x ),2) + pow(( goal_to_reach.y - current_position.y ),2));
         //rotation_to_do = acos((goal_to_reach.x -current_position.x)/ translation_to_do);
 
@@ -350,7 +307,6 @@ void update() {
 
 
     }
-}
 
     //new_amcl = false;
 
